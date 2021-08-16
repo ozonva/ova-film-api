@@ -1,4 +1,4 @@
-package ova_film_api
+package utils
 
 func HelloWorldText() string {
 	return "Hello world!\n"
