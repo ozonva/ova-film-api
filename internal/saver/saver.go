@@ -3,6 +3,7 @@ package saver
 import (
 	"github.com/ozonva/ova_film_api/internal/flusher"
 	"github.com/ozonva/ova_film_api/internal/movies"
+	"time"
 )
 
 type Saver interface {
@@ -13,11 +14,22 @@ type Saver interface {
 func NewSaver(
 	capacity uint,
 	flusher flusher.Flusher,
+	timeout time.Duration,
 ) Saver {
-	return &saver{
+	saver := saver{
 		movies:  make([]movies.Movie, capacity),
 		flusher: flusher,
 	}
+
+	go func() {
+		ticker := time.NewTicker(timeout)
+		for {
+			<-ticker.C
+			saver.Close()
+		}
+	}()
+
+	return &saver
 }
 
 type saver struct {
@@ -25,10 +37,10 @@ type saver struct {
 	flusher flusher.Flusher
 }
 
-func (s saver) Save(movie movies.Movie) {
+func (s *saver) Save(movie movies.Movie) {
 	s.movies = append(s.movies, movie)
 }
 
-func (s saver) Close() {
+func (s *saver) Close() {
 	s.movies = s.flusher.Flush(s.movies)
 }
