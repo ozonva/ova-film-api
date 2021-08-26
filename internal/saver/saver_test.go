@@ -71,7 +71,6 @@ var _ = Describe("Saver", func() {
 					timer := time.NewTimer(1 * time.Second)
 					<-timer.C
 				}
-
 			})
 		})
 	})

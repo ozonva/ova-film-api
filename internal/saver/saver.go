@@ -12,15 +12,14 @@ type Saver interface {
 }
 
 func NewSaver(
-	capacity uint,
+	capacity int,
 	flusher flusher.Flusher,
 	timeout time.Duration,
 ) Saver {
 	saver := saver{
-		movies:   make([]movies.Movie, capacity),
+		movies:   make([]movies.Movie, 0),
 		flusher:  flusher,
 		capacity: capacity,
-		peek:     0,
 	}
 
 	go func() {
@@ -37,19 +36,16 @@ func NewSaver(
 type saver struct {
 	movies   []movies.Movie
 	flusher  flusher.Flusher
-	capacity uint
-	peek     uint
+	capacity int
 }
 
 func (s *saver) Save(movie movies.Movie) {
-	s.movies[s.peek] = movie
-	s.peek++
-	if s.peek == s.capacity {
+	s.movies = append(s.movies, movie)
+	if len(s.movies) == s.capacity {
 		s.Close()
 	}
 }
 
 func (s *saver) Close() {
-	s.movies = s.flusher.Flush(s.movies[:s.peek])
-	s.peek = 0
+	s.movies = s.flusher.Flush(s.movies)
 }
