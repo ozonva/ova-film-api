@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/ozonva/ova_film_api/internal/movies"
 	"github.com/ozonva/ova_film_api/internal/utils"
+	"time"
 )
 
 func main() {
@@ -78,6 +79,14 @@ func main() {
 		for _, slice := range slices {
 			fmt.Println(slice)
 		}
+	}
+
+	{
+		fmt.Println()
+		fmt.Println("--Timer--")
+		timer := time.NewTimer(2 * time.Second)
+		fmt.Println("timer created")
+		fmt.Println(<-timer.C)
 	}
 
 }
