@@ -4,6 +4,7 @@ package service
 
 import (
 	context "context"
+	"github.com/rs/zerolog/log"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -34,38 +35,26 @@ func NewMovieServiceClient(cc grpc.ClientConnInterface) MovieServiceClient {
 }
 
 func (c *movieServiceClient) CreateMovie(ctx context.Context, in *Movie, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	log.Print("CreateMovie performed")
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/ova_film_api.MovieService/createMovie", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
 	return out, nil
 }
 
 func (c *movieServiceClient) DescribeMovie(ctx context.Context, in *DescribeMovieMessage, opts ...grpc.CallOption) (*Movie, error) {
 	out := new(Movie)
-	err := c.cc.Invoke(ctx, "/ova_film_api.MovieService/describeMovie", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
+	log.Print("DescribeMovie performed")
 	return out, nil
 }
 
 func (c *movieServiceClient) RemoveMovie(ctx context.Context, in *RemoveMovieMessage, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/ova_film_api.MovieService/removeMovie", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
+	log.Print("RemoveMovie performed")
 	return out, nil
 }
 
 func (c *movieServiceClient) ListMovies(ctx context.Context, in *MovieListRequest, opts ...grpc.CallOption) (*MovieList, error) {
 	out := new(MovieList)
-	err := c.cc.Invoke(ctx, "/ova_film_api.MovieService/listMovies", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
+	log.Print("ListMovies performed")
 	return out, nil
 }
 
