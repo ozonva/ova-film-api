@@ -1,5 +1,6 @@
 syntax = "proto3";
 
+import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
 option go_package = "github.com/ozonva/ova_film_api/pkg/service";
@@ -7,10 +8,27 @@ option go_package = "github.com/ozonva/ova_film_api/pkg/service";
 package ova_film_api;
 
 service MovieService {
-  rpc createMovie (Movie) returns (google.protobuf.Empty);
-  rpc describeMovie (DescribeMovieMessage) returns (Movie);
-  rpc removeMovie (RemoveMovieMessage) returns (google.protobuf.Empty);
-  rpc listMovies (MovieListRequest) returns (MovieList);
+  rpc createMovie (Movie) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/movies"
+      body: "*"
+    };
+  }
+  rpc describeMovie (DescribeMovieMessage) returns (Movie) {
+    option (google.api.http) = {
+      get: "/v1/movies/{movieId}"
+    };
+  }
+  rpc removeMovie (RemoveMovieMessage) returns (google.protobuf.Empty){
+    option (google.api.http) = {
+      delete: "/v1/movies/{movieId}"
+    };
+  }
+  rpc listMovies (MovieListRequest) returns (MovieList) {
+    option (google.api.http) = {
+      get: "/v1/movies"
+    };
+  }
 }
 
 message Movie {
