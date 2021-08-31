@@ -4,11 +4,10 @@ package service
 
 import (
 	context "context"
-	"github.com/rs/zerolog/log"
+	empty "github.com/golang/protobuf/ptypes/empty"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -20,9 +19,9 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MovieServiceClient interface {
-	CreateMovie(ctx context.Context, in *Movie, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	CreateMovie(ctx context.Context, in *Movie, opts ...grpc.CallOption) (*empty.Empty, error)
 	DescribeMovie(ctx context.Context, in *DescribeMovieMessage, opts ...grpc.CallOption) (*Movie, error)
-	RemoveMovie(ctx context.Context, in *RemoveMovieMessage, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	RemoveMovie(ctx context.Context, in *RemoveMovieMessage, opts ...grpc.CallOption) (*empty.Empty, error)
 	ListMovies(ctx context.Context, in *MovieListRequest, opts ...grpc.CallOption) (*MovieList, error)
 }
 
@@ -34,27 +33,39 @@ func NewMovieServiceClient(cc grpc.ClientConnInterface) MovieServiceClient {
 	return &movieServiceClient{cc}
 }
 
-func (c *movieServiceClient) CreateMovie(ctx context.Context, in *Movie, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	log.Print("CreateMovie performed")
-	out := new(emptypb.Empty)
+func (c *movieServiceClient) CreateMovie(ctx context.Context, in *Movie, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/ova_film_api.MovieService/createMovie", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
 	return out, nil
 }
 
 func (c *movieServiceClient) DescribeMovie(ctx context.Context, in *DescribeMovieMessage, opts ...grpc.CallOption) (*Movie, error) {
 	out := new(Movie)
-	log.Print("DescribeMovie performed")
+	err := c.cc.Invoke(ctx, "/ova_film_api.MovieService/describeMovie", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
 	return out, nil
 }
 
-func (c *movieServiceClient) RemoveMovie(ctx context.Context, in *RemoveMovieMessage, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
-	log.Print("RemoveMovie performed")
+func (c *movieServiceClient) RemoveMovie(ctx context.Context, in *RemoveMovieMessage, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
+	err := c.cc.Invoke(ctx, "/ova_film_api.MovieService/removeMovie", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
 	return out, nil
 }
 
 func (c *movieServiceClient) ListMovies(ctx context.Context, in *MovieListRequest, opts ...grpc.CallOption) (*MovieList, error) {
 	out := new(MovieList)
-	log.Print("ListMovies performed")
+	err := c.cc.Invoke(ctx, "/ova_film_api.MovieService/listMovies", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
 	return out, nil
 }
 
@@ -62,9 +73,9 @@ func (c *movieServiceClient) ListMovies(ctx context.Context, in *MovieListReques
 // All implementations must embed UnimplementedMovieServiceServer
 // for forward compatibility
 type MovieServiceServer interface {
-	CreateMovie(context.Context, *Movie) (*emptypb.Empty, error)
+	CreateMovie(context.Context, *Movie) (*empty.Empty, error)
 	DescribeMovie(context.Context, *DescribeMovieMessage) (*Movie, error)
-	RemoveMovie(context.Context, *RemoveMovieMessage) (*emptypb.Empty, error)
+	RemoveMovie(context.Context, *RemoveMovieMessage) (*empty.Empty, error)
 	ListMovies(context.Context, *MovieListRequest) (*MovieList, error)
 	mustEmbedUnimplementedMovieServiceServer()
 }
@@ -73,13 +84,13 @@ type MovieServiceServer interface {
 type UnimplementedMovieServiceServer struct {
 }
 
-func (UnimplementedMovieServiceServer) CreateMovie(context.Context, *Movie) (*emptypb.Empty, error) {
+func (UnimplementedMovieServiceServer) CreateMovie(context.Context, *Movie) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateMovie not implemented")
 }
 func (UnimplementedMovieServiceServer) DescribeMovie(context.Context, *DescribeMovieMessage) (*Movie, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DescribeMovie not implemented")
 }
-func (UnimplementedMovieServiceServer) RemoveMovie(context.Context, *RemoveMovieMessage) (*emptypb.Empty, error) {
+func (UnimplementedMovieServiceServer) RemoveMovie(context.Context, *RemoveMovieMessage) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RemoveMovie not implemented")
 }
 func (UnimplementedMovieServiceServer) ListMovies(context.Context, *MovieListRequest) (*MovieList, error) {
