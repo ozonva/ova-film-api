@@ -1,27 +1,68 @@
-build:
-	go build -o film ./cmd/main.go
+.PHONY: build
+build: vendor-proto .generate .build
 
-run:
-	./film
+.PHONY: .generate
+.generate:
+		mkdir -p swagger
+		mkdir -p pkg/service
+		protoc -I vendor.protogen \
+				--go_out=pkg/service --go_opt=paths=import \
+				--go-grpc_out=pkg/service --go-grpc_opt=paths=import \
+				--grpc-gateway_out=pkg/service \
+				--grpc-gateway_opt=logtostderr=true \
+				--grpc-gateway_opt=paths=import \
+				--validate_out lang=go:pkg/service \
+				--swagger_out=allow_merge=true,merge_file_name=api:swagger \
+				--proto_path=pkg/proto/ service.proto
+		mv pkg/service/github.com/ozonva/ova_film_api/* pkg/service/
+		rm -rf pkg/service/github.com
+		mkdir -p cmd/service
 
-mockgen:
-	mockgen -source=internal/repo/repo.go -destination=./mocks/repo_mock.go -package=mocks github.com/ozonva/ova_film_api/internal/repo Repo
+.PHONY: .build
+.build:
+		CGO_ENABLED=0 GOOS=linux go build -o bin/service cmd/service/main.go
 
-test:
-	cd internal/flusher && go test
+.PHONY: install
+install: build .install
 
-deps:
-	ls go.mod || go mod init github.com/ozonva/ova_film_api
-	GOBIN=$(LOCAL_BIN) go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
-	GOBIN=$(LOCAL_BIN) go get -u github.com/golang/protobuf/proto
-	GOBIN=$(LOCAL_BIN) go get -u github.com/golang/protobuf/protoc-gen-go
-	GOBIN=$(LOCAL_BIN) go get -u google.golang.org/grpc
-	GOBIN=$(LOCAL_BIN) go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc
-	GOBIN=$(LOCAL_BIN) go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
-	GOBIN=$(LOCAL_BIN) go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
-	GOBIN=$(LOCAL_BIN) go get google.golang.org/protobuf/reflect/protoreflect@v1.27.1
-	GOBIN=$(LOCAL_BIN) go get google.golang.org/protobuf/runtime/protoimpl@v1.27.1
-	GOBIN=$(LOCAL_BIN) go get github.com/rs/zerolog/log
+.PHONY: .install
+install:
+		go install cmd/grpc-server/main.go
 
-grpcgen:
-	protoc -I vendor.protogen --go_out=pkg/service --go_opt=paths=import --go-grpc_out=pkg/service --go-grpc_opt=paths=import --proto_path=pkg/proto/ service.proto
+.PHONY: vendor-proto
+vendor-proto: .vendor-proto
+
+.PHONY: .vendor-proto
+.vendor-proto:
+		mkdir -p vendor.protogen
+		mkdir -p vendor.protogen/api/service
+		yes | cp -rf pkg/proto/service.proto vendor.protogen/api/service
+		@if [ ! -d vendor.protogen/google ]; then \
+			git clone https://github.com/googleapis/googleapis vendor.protogen/googleapis &&\
+			mkdir -p  vendor.protogen/google/ &&\
+			mv vendor.protogen/googleapis/google/api vendor.protogen/google &&\
+			rm -rf vendor.protogen/googleapis ;\
+		fi
+		@if [ ! -d vendor.protogen/github.com/envoyproxy ]; then \
+			mkdir -p vendor.protogen/github.com/envoyproxy &&\
+			git clone https://github.com/envoyproxy/protoc-gen-validate vendor.protogen/github.com/envoyproxy/protoc-gen-validate ;\
+		fi
+
+
+.PHONY: deps
+deps: install-go-deps
+
+.PHONY: install-go-deps
+install-go-deps: .install-go-deps
+
+.PHONY: .install-go-deps
+.install-go-deps:
+		ls go.mod || go mod init
+		go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
+		go get -u github.com/golang/protobuf/proto
+		go get -u github.com/golang/protobuf/protoc-gen-go
+		go get -u google.golang.org/grpc
+		go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc
+		go get github.com/envoyproxy/protoc-gen-validate
+		go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
+		go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
