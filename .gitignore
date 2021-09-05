@@ -2,3 +2,5 @@
 film
 mocks
 vendor.protogen
+pkg/generated
+/bin/ova_film_api

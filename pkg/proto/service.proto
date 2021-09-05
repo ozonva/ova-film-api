@@ -3,7 +3,7 @@ syntax = "proto3";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
-option go_package = "github.com/ozonva/ova_film_api/pkg/service";
+option go_package = "github.com/ozonva/ova_film_api/api";
 
 package ova_film_api;
 

@@ -3,24 +3,24 @@ build: vendor-proto .generate .build
 
 .PHONY: .generate
 .generate:
+		rm -rf pkg/generated
 		mkdir -p swagger
-		mkdir -p pkg/service
+		mkdir -p pkg/generated
 		protoc -I vendor.protogen \
-				--go_out=pkg/service --go_opt=paths=import \
-				--go-grpc_out=pkg/service --go-grpc_opt=paths=import \
-				--grpc-gateway_out=pkg/service \
+				--go_out=pkg/generated --go_opt=paths=import \
+				--go-grpc_out=pkg/generated --go-grpc_opt=paths=import \
+				--grpc-gateway_out=pkg/generated \
 				--grpc-gateway_opt=logtostderr=true \
 				--grpc-gateway_opt=paths=import \
-				--validate_out lang=go:pkg/service \
+				--validate_out lang=go:pkg/generated \
 				--swagger_out=allow_merge=true,merge_file_name=api:swagger \
 				--proto_path=pkg/proto/ service.proto
-		mv pkg/service/github.com/ozonva/ova_film_api/* pkg/service/
-		rm -rf pkg/service/github.com
-		mkdir -p cmd/service
+		mv pkg/generated/github.com/ozonva/ova_film_api/* pkg/generated/
+		rm -rf pkg/generated/github.com
 
 .PHONY: .build
 .build:
-		CGO_ENABLED=0 GOOS=linux go build -o bin/service cmd/service/main.go
+		CGO_ENABLED=0 GOOS=linux go build -o bin/ova_film_api cmd/ova_film_api/main.go
 
 .PHONY: install
 install: build .install

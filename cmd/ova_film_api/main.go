@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/ozonva/ova_film_api/pkg/service/pkg/service"
-	//"github.com/ozonva/ova_film_api/pkg/service/github.com/ozonva/ova_film_api/pkg/service"
+	"github.com/ozonva/ova_film_api/pkg/generated/api"
+	"github.com/ozonva/ova_film_api/pkg/ova_film_api"
 	"google.golang.org/grpc"
 	"log"
 	"net"
@@ -20,7 +20,7 @@ func run() error {
 	}
 
 	s := grpc.NewServer()
-	service.RegisterMovieServiceServer(s, service.ImplementedMovieServiceServer{})
+	api.RegisterMovieServiceServer(s, ova_film_api.ImplementedMovieServiceServer{})
 
 	if err := s.Serve(listen); err != nil {
 		log.Fatalf("failed to serve: %v", err)
