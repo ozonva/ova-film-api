@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/ozonva/ova_film_api/api";
+
+package ova_film_api;
+
+service MovieService {
+  rpc createMovie (Movie) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/movies"
+      body: "*"
+    };
+  }
+  rpc describeMovie (DescribeMovieMessage) returns (Movie) {
+    option (google.api.http) = {
+      get: "/v1/movies/{movieId}"
+    };
+  }
+  rpc removeMovie (RemoveMovieMessage) returns (google.protobuf.Empty){
+    option (google.api.http) = {
+      delete: "/v1/movies/{movieId}"
+    };
+  }
+  rpc listMovies (MovieListRequest) returns (MovieList) {
+    option (google.api.http) = {
+      get: "/v1/movies"
+    };
+  }
+}
+
+message Movie {
+  uint64 id = 1;
+  uint64 userId = 2;
+  string name = 3;
+  uint32 year = 4;
+}
+
+message DescribeMovieMessage {
+  uint64 movieId = 1;
+}
+
+message RemoveMovieMessage {
+  uint64 movieId = 1;
+}
+
+message MovieList {
+  repeated Movie movies = 1;
+}
+
+message MovieListRequest {
+}
