@@ -77,5 +77,5 @@ var _ = Describe("Saver", func() {
 })
 
 func createMovie(id uint64) movies.Movie {
-	return *movies.New(id, 5, "Movie", 2000)
+	return *movies.New(id, 5, "Movie", "2000")
 }

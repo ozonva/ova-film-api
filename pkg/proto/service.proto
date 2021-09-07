@@ -35,7 +35,7 @@ message Movie {
   uint64 id = 1;
   uint64 userId = 2;
   string name = 3;
-  uint32 year = 4;
+  string year = 4;
 }
 
 message DescribeMovieMessage {

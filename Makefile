@@ -66,3 +66,46 @@ install-go-deps: .install-go-deps
 		go get github.com/envoyproxy/protoc-gen-validate
 		go install google.golang.org/grpc/cmd/protoc-gen-go-grpc
 		go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
+
+
+db-create:
+	docker run -d \
+		--name pg \
+		-e POSTGRES_USER=ovafilm \
+		-e POSTGRES_PASSWORD=ovafilm \
+		-e POSTGRES_DB=ovafilm \
+		-e PGDATA=/var/lib/postgresql/data/pgdata \
+		-v ~/psqldata:/var/lib/postgresql/data \
+		-p 5432:5432 \
+		postgres
+	sleep 3
+
+db-start:
+	docker start pg
+
+db-stop:
+	docker stop pg
+
+db-destroy:
+	docker rm pg
+
+db-cmd:
+	docker exec -it pg psql -Uovafilm -dovafilm
+
+goose-install:
+	go get -u github.com/pressly/goose/v3/cmd/goose
+
+goose-status:
+	goose -dir ./goose postgres "user=ovafilm password=ovafilm dbname=ovafilm sslmode=disable" status
+
+goose-up:
+	goose -dir ./goose postgres "user=ovafilm password=ovafilm dbname=ovafilm sslmode=disable" up
+
+goose-down:
+	goose -dir ./goose postgres "user=ovafilm password=ovafilm dbname=ovafilm sslmode=disable" down
+
+start:
+	./bin/ova_film_api
+
+.PHONY: install
+install: vendor-proto .generate .build db-create goose-install goose-up

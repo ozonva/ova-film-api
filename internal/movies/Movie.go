@@ -7,12 +7,12 @@ import (
 
 type Movie struct {
 	Id     uint64
-	UserId uint64
-	Name   string
-	Year   uint
+	UserId uint64 `db:"user_id"`
+	Name   string `db:"title"`
+	Year   string
 }
 
-func New(id uint64, userId uint64, name string, year uint) *Movie {
+func New(id uint64, userId uint64, name string, year string) *Movie {
 	return &Movie{Id: id, UserId: userId, Name: name, Year: year}
 }
 
@@ -21,7 +21,7 @@ func (r *Movie) String() string {
 		strconv.FormatUint(r.Id, 10),
 		strconv.FormatUint(r.UserId, 10),
 		r.Name,
-		strconv.FormatUint(uint64(r.Year), 10),
+		r.Year,
 	}, ", ")
 	return strings.Join([]string{"{", fields, "}"}, "")
 }
