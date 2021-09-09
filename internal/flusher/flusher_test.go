@@ -92,7 +92,7 @@ var _ = Describe("Flusher", func() {
 })
 
 func createMovie(id uint64) movies.Movie {
-	return *movies.New(id, 5, "Movie", 2000)
+	return *movies.New(id, 5, "Movie", "2000")
 }
 
 func createMovies(count int) []movies.Movie {
